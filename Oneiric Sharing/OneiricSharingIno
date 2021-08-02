@@ -1,0 +1,79 @@
+//local ip 192.168.1.93
+#include <WiFi.h>
+#include <AsyncUDP.h>
+#include <OSCMessage.h>
+
+//define uses less memory in c # is a directive to compiler
+#define hallPin1 34
+#define WIFI_NETWORK "ATTWe9GIre"
+#define WIFI_PASSWORD "mbzc#88jeb8w"
+#define WIFI_TIMEOUT 50000
+#define port 1235
+
+//with WiFi esp32 can only use ADC#1 pins: A2/34, A3/39, A4/36, A9/33, A7/32
+int halls[]={A2,A3,A4,A9};
+
+AsyncUDP udp;
+
+AsyncUDPMessage mess;
+
+OSCMessage msg= "/";
+
+void connectWifi(){
+  Serial.print("Connecting to Wifi");
+  //broadcasting data not access point
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(WIFI_NETWORK, WIFI_PASSWORD);
+
+  //dealing with inability to connect to wifi
+  unsigned long startTime= millis();
+
+  while(WiFi.status() != WL_CONNECTED && millis()- startTime< WIFI_TIMEOUT){
+    Serial.print(".");
+    delay(100);
+    }
+
+   if (WiFi.status() != WL_CONNECTED){
+    Serial.println("Failed");
+    }else{
+      Serial.print("Connected: ");
+      Serial.print(WiFi.localIP());
+    }
+  }
+  
+void setup() {
+ Serial.begin(115200);
+ 
+ //intiialize pins as input
+ for (int arrayPos = 0; arrayPos < 5; arrayPos++) {
+    pinMode(halls[arrayPos], INPUT);
+  }
+  
+ connectWifi();
+ if(udp.connect(IPAddress(192,168,1,93), port)) {
+        Serial.println("UDP connected");
+ }
+}
+
+void loop() {
+ int arrayPos;
+ for (arrayPos = 0; arrayPos < 4; arrayPos++) {
+   hRead(arrayPos);
+ }
+ //putting it in a message that can be sent w this UDP library
+ msg.send(mess);
+ //sending it
+ udp.broadcastTo(mess,port);
+ //clearing the osc message
+ msg.empty();
+ //clearing the udp message
+ mess.flush();
+ delay(200);
+}
+
+void hRead(int arrayPos){  
+  int value = analogRead(halls[arrayPos]);
+  //adding data to OSC message
+  msg.add(value);
+  }
+   
