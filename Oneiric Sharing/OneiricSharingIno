@@ -1,4 +1,4 @@
-//local ip 192.168.1.93
+/*for communicating sensor data with Max/Msp over WiFi using OSC and UDP */
 #include <WiFi.h>
 #include <AsyncUDP.h>
 #include <OSCMessage.h>
