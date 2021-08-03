@@ -5,8 +5,8 @@
 
 //define uses less memory in c # is a directive to compiler
 #define hallPin1 34
-#define WIFI_NETWORK "ATTWe9GIre"
-#define WIFI_PASSWORD "mbzc#88jeb8w"
+#define WIFI_NETWORK "xxxx"
+#define WIFI_PASSWORD "xxxx"
 #define WIFI_TIMEOUT 50000
 #define port 1235
 
